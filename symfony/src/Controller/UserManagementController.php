@@ -12,13 +12,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class UserManagementController extends AbstractController
+class UserController extends AbstractController
 {
     #[Route('/user', name: 'user_index')]
     public function index(): Response
     {
         return $this->render('user_management/index.html.twig', [
-            'controller_name' => 'UserManagementController',
+            'controller_name' => 'UserController',
         ]);
     }
 
