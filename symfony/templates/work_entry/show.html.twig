@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Work Entry form
+{% endblock %}
+{% block body %}
+    {{ form(work_entry_form) }}
+    {% if work_entry is defined %}
+        <button class="btn btn-sm btn-danger delete_work_entry" data-id="{{ work_entry.id }}">
+            Delete work entry  
+        </button>
+    {% endif %}
+{% endblock %}
+    

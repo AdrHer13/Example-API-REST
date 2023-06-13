@@ -1,20 +1,80 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello WorkEntryController!{% endblock %}
+{% block title %}
+    Work Entry list
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <style>
+        .content {
+            position: fixed;
+            top: 2em;
+            left: calc( 50% - ( 60em / 2) );
+        }
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        #new_button {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+        }
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ '/var/www/symfony/src/Controller/WorkEntryController.php'|file_link(0) }}">src/Controller/WorkEntryController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/var/www/symfony/templates/work_entry/index.html.twig'|file_link(0) }}">templates/work_entry/index.html.twig</a></code></li>
-    </ul>
-</div>
+        .content table {
+            width: 60em;
+        }
+
+        .content th {
+            width: fit-content;
+            border: solid 1px black;
+            border-left: solid 3px black;
+            border-right: solid 3px black;
+            padding-left: 0.5em;
+        }
+
+        .content td {
+            width: fit-content;
+            border: solid 1px black;
+            border-left: solid 3px black;
+            border-right: solid 3px black;
+            padding-left: 0.5em;
+        }
+
+        .delete_button {
+            text-align: center;
+            padding-left: 0!important;
+        }
+    </style>
+    <div class="content">
+        <h1>Work Entry List</h1>
+        <a href="{{ path('work_create') }}" id="new_button" class="btn btn-sm btn-primary">New</a>
+        <table id="work_entry_list">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID and Name</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work_entry in work_entries %}
+                    <tr id="row_{{ work_entry.id }}">
+                        <td> <a href="{{ path('work_show', {'id': work_entry.id}) }}">{{ work_entry.id }}</a> </td>
+                        <td> {{ work_entry.user.id }} | {{ work_entry.user.name }} </td>
+                        <td> {{ work_entry.startDate|date("d/m/Y H:i") }} </td>
+                        {% if work_entry.endDate is null %}
+                            <td> NULL </td>
+                        {% else %}
+                            <td> {{ work_entry.endDate|date("d/m/Y H:i") }} </td>
+                        {% endif %}
+                        <td> {{ work_entry.createdAt|date("d/m/Y") }} </td>
+                        <td> {{ work_entry.updatedAt|date("d/m/Y") }} </td>
+                        <td class="delete_button"> <button class="btn btn-sm btn-danger delete_work_entry" data-id="{{ work_entry.id }}"> Delete work_entry </button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

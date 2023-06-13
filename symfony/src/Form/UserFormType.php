@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\User;
-use phpDocumentor\Reflection\PseudoTypes\True_;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -16,9 +15,6 @@ class UserFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            // ->add('createdAt')
-            // ->add('updatedAt')
-            // ->add('deletedAt')
             ->add('name', TextType::class, ['required' => true])
             ->add('email', EmailType::class, ['required' => true])
             ->add('submit', SubmitType::class)

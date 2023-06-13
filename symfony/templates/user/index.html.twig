@@ -27,6 +27,7 @@
             border: solid 1px black;
             border-left: solid 3px black;
             border-right: solid 3px black;
+            padding-left: 0.5em;
         }
 
         .content td {
@@ -34,10 +35,12 @@
             border: solid 1px black;
             border-left: solid 3px black;
             border-right: solid 3px black;
+            padding-left: 0.5em;
         }
 
         .delete_button {
             text-align: center;
+            padding-left: 0!important;
         }
     </style>
     <div class="content">
@@ -62,7 +65,7 @@
                         <td> {{ user.email }} </td>
                         <td> {{ user.createdAt|date("d/m/Y") }} </td>
                         <td> {{ user.updatedAt|date("d/m/Y") }} </td>
-                        <td class="delete_button"> <button class="btn btn-sm btn-danger delete_user" data-id="{{ user.id }}"> Borrar usuario </button></td>
+                        <td class="delete_button"> <button class="btn btn-sm btn-danger delete_user" data-id="{{ user.id }}"> Delete user </button></td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: WorkEntryRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class WorkEntry
 {
     #[ORM\Id]
@@ -108,5 +109,18 @@ class WorkEntry
         $this->endDate = $endDate;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTime("now", new \DateTimeZone('Europe/Madrid'));
+        $this->updatedAt = new \DateTime("now", new \DateTimeZone('Europe/Madrid'));
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate()
+    {
+        $this->updatedAt = new \DateTime("now", new \DateTimeZone('Europe/Madrid'));
     }
 }

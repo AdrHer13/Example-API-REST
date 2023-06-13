@@ -72,12 +72,47 @@
                         }
                     });
                 }
+
+                function deleteWorkEntry(workEntryId) {
+                    // Prepare the data to be sent
+                    var data = {
+                        work_entry_id: workEntryId
+                    };
+
+                    // Perform the Ajax request
+                    $.ajax({
+                        type: 'DELETE',
+                        url: "{{ path('work_delete') }}",
+                        data: data,
+                        success: function(response) {
+                            alert(response['message']);
+                            if (window.location.pathname != response['redirect_url'])
+                            {
+                                showLoadingModal();
+                                window.location.href = response['redirect_url'];
+                            } else {
+                                $("#row_" + workEntryId).remove()
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert(xhr.responseText);
+                        },
+                        complete: function() {
+                            hideLoadingModal();
+                        }
+                    });
+                }
         </script>
         <script>
             $(document).ready(function() {
                 $('.delete_user').on('click', function() {
                     showLoadingModal();
                     deleteUser($(this).data('id'));
+                    $(this).off('click');
+                });
+                $('.delete_work_entry').on('click', function() {
+                    showLoadingModal();
+                    deleteWorkEntry($(this).data('id'));
                     $(this).off('click');
                 });
             });
