@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    User form
+{% endblock %}
+{% block body %}
+    {{ form(user_form) }}
+    {% if user is defined %}
+        <button class="btn btn-sm btn-danger delete_user" data-id="{{ user.id }}">
+            Borrar usuario  
+        </button>
+    {% endif %}
+{% endblock %}
+    

@@ -5,25 +5,20 @@ namespace App\Controller;
 // use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use App\Entity\User;
-use Doctrine\ORM\EntityManager;
+use App\Form\UserFormType;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twig\Environment;
 
 class UserController extends AbstractController
 {
     #[Route('/user', name: 'user_index')]
-    public function index(): Response
-    {
-        return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
-    }
-
-    #[Route('/user/all', name: 'user_get_all_users', methods: ['get'])]
-    public function getAllUsers(EntityManager $em): JsonResponse
+    public function index(EntityManagerInterface $em, Environment $environment): Response
     {
         $users = $em
             ->getRepository(User::class)
@@ -43,89 +38,95 @@ class UserController extends AbstractController
             }
         }
 
-        return $this->json($data);
+        return new Response($environment->render('user/index.html.twig', [
+            'users' => $data,
+        ]));
     }
 
-    #[Route('/user/create', name: 'user_create', methods: ['post'])]
-    public function create(EntityManager $em, Request $request): JsonResponse
+    /**
+     * Uses GET for rendering the form. When POST is used, it flushes the data
+     */
+    #[Route('/user/new', name: 'user_create', methods: ['get', 'post'])]
+    public function create(EntityManagerInterface $em, Request $request, Environment $environment): Response
     {
         $user = new User();
-        $user->setName($request->request->get('name'));
-        $user->setEmail($request->request->get('email'));
+        $form = $this->createForm(UserFormType::class, $user);
 
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+            $em->persist($user);
+            $em->flush();
+
+            return $this->redirectToRoute('user_index');
+        }
+
+        return new Response($environment->render('user/show.html.twig', [
+            'user_form' => $form->createView()
+        ]));
+    }
+
+    #[Route('/user/show/{id}', name: 'user_show', methods: ['get'])]
+    public function show(EntityManagerInterface $em, int $id, Environment $environment): Response
+    {
+        $user = $em->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            return $this->redirectToRoute('user_create');
+        }
+
+        $form = $this->createForm(UserFormType::class, $user, [
+            'action' => $this->generateUrl('user_update', ['id' => $id]),
+            'method' => "PUT",
+        ]);
+
+        return new Response($environment->render('user/show.html.twig', [
+            'user_form' => $form->createView(),
+            'user' => $user,
+        ]));
+    }
+
+    #[Route('/user/update/{id}', name: 'user_update', methods: ['put'])]
+    public function update(EntityManagerInterface $em, Request $request, int $id): mixed
+    {
+        $user = $em->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            return $this->json('No user found for id' . $id, 404);
+        }
+
+        $user->setName($request->get('user_form')['name']);
+        $user->setEmail($request->get('user_form')['email']);
         $em->persist($user);
         $em->flush();
 
-        $data =  [
-            'id' => $user->getId(),
-            'createdAt' => $user->getCreatedAt(),
-            'updatedAt' => $user->getUpdatedAt(),
-            'deletedAt' => $user->getDeletedAt(),
-            'name' => $user->getName(),
-            'email' => $user->getEmail(),
-        ];
-
-        return $this->json($data);
+        return $this->redirectToRoute('user_index');
     }
 
-    #[Route('/user/{id}', name: 'user_show', methods: ['get'])]
-    public function show(EntityManager $em, int $id): JsonResponse
+    #[Route('/user/delete', name: 'user_delete', methods: ['delete'])]
+    public function delete(EntityManagerInterface $em, Request $request): JsonResponse
     {
+        $id = $request->get('user_id');
+
         $user = $em->getRepository(User::class)->find($id);
 
         if (!$user) {
-            return $this->json('No user found for id ' . $id, 404);
+            throw $this->createNotFoundException('User not found');
         }
 
-        $data =  [
-            'id' => $user->getId(),
-            'createdAt' => $user->getCreatedAt(),
-            'updatedAt' => $user->getUpdatedAt(),
-            'deletedAt' => $user->getDeletedAt(),
-            'name' => $user->getName(),
-            'email' => $user->getEmail(),
+        $user->setDeletedAt(new \DateTime("now", new \DateTimeZone('Europe/Madrid')));
+        try {
+            $em->persist($user);
+            $em->flush();
+        } catch (Exception $e) {
+            $errorMessage = 'An error occurred while deleting user with id ' . $id . ': ' . $e->getMessage();
+            return new JsonResponse($errorMessage);
+        }
+
+        $data = [
+            'redirect_url' => $this->generateUrl('user_index'),
+            'message' => 'Deleted user successfully with id ' . $id,
         ];
-
-        return $this->json($data);
-    }
-
-    #[Route('/user/{id}', name: 'user_update', methods: ['put'])]
-    public function update(EntityManager $em, Request $request, int $id): JsonResponse
-    {
-        $user = $em->getRepository(User::class)->find($id);
-
-        if (!$user) {
-            return $this->json('No user found for id' . $id, 404);
-        }
-
-        $user->setName($request->request->get('name'));
-        $user->setEmail($request->request->get('email'));
-        $em->flush();
-
-        $data =  [
-            'id' => $user->getId(),
-            'createdAt' => $user->getCreatedAt(),
-            'updatedAt' => $user->getUpdatedAt(),
-            'deletedAt' => $user->getDeletedAt(),
-            'name' => $user->getName(),
-            'email' => $user->getEmail(),
-        ];
-
-        return $this->json($data);
-    }
-
-    #[Route('/user/{id}', name: 'user_delete', methods: ['delete'])]
-    public function delete(EntityManager $em, int $id): JsonResponse
-    {
-        $user = $em->getRepository(User::class)->find($id);
-
-        if (!$user) {
-            return $this->json('No user found for id' . $id, 404);
-        }
-
-        $user->setDeletedAt(new \DateTime("now"));
-        $em->flush();
-
-        return $this->json('Deleted a user successfully with id ' . $id);
+        return new JsonResponse($data);
     }
 }

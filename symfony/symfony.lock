@@ -53,6 +53,9 @@
             "ref": "cc04e10cf7171525b50c18b36004edf64cb478be"
         }
     },
+    "mopa/bootstrap-bundle": {
+        "version": "v3.4.2"
+    },
     "phpunit/phpunit": {
         "version": "9.6",
         "recipe": {

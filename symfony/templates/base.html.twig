@@ -2,7 +2,12 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>
+            {% block title %}
+                Welcome!       
+                            
+            {% endblock %}
+        </title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
         {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
         {% block stylesheets %}
@@ -12,8 +17,72 @@
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
     </head>
     <body>
         {% block body %}{% endblock %}
+
+        <div id="loading-modal" style="display:none; position: absolute; top: 0; left: 0; z-index: 99; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5)">
+            <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem; position: fixed; top: calc( 50% - ( 4rem / 2) ); left: calc( 50% - ( 4rem / 2) ); --bs-spinner-border-width: 0.5em;">
+                <span class="sr-only"></span>
+            </div>
+        </div>
+
+        {% block javascripts_end_of_body %}
+        <script>
+                function showLoadingModal() {
+                document.getElementById('loading-modal').style.display = 'block';
+              }
+            
+              function hideLoadingModal() {
+                document.getElementById('loading-modal').style.display = 'none';
+              }
+            </script>
+            <script>
+                function deleteUser(userId) {
+                    // Prepare the data to be sent
+                    var data = {
+                        user_id: userId
+                    };
+
+                    // Perform the Ajax request
+                    $.ajax({
+                        type: 'DELETE',
+                        url: "{{ path('user_delete') }}",
+                        data: data,
+                        success: function(response) {
+                            alert(response['message']);
+                            if (window.location.pathname != response['redirect_url'])
+                            {
+                                showLoadingModal();
+                                window.location.href = response['redirect_url'];
+                            } else {
+                                $("#row_" + userId).remove()
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert(xhr.responseText);
+                        },
+                        complete: function() {
+                            hideLoadingModal();
+                        }
+                    });
+                }
+        </script>
+        <script>
+            $(document).ready(function() {
+                $('.delete_user').on('click', function() {
+                    showLoadingModal();
+                    deleteUser($(this).data('id'));
+                    $(this).off('click');
+                });
+            });
+            
+        </script>
+        {% endblock %}
     </body>
 </html>

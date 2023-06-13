@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+{% block modal_body %}
+    <div>Are you sure you want to delete this {{ type }}?</div>
+{% endblock %}
+{% block modal_footer %}
+{{ form(user_delete_form) }}
+    {# <button type="button" class="btn btn-secondary" data-dismiss="modal">
+        Close
+    </button>
+    <button type="submit" class="btn btn-danger">
+        Save changes
+    </button> #}
+{% endblock %}
