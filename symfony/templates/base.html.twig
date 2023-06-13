@@ -9,7 +9,6 @@
             {% endblock %}
         </title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
@@ -25,6 +24,29 @@
     </head>
     <body>
         {% block body %}{% endblock %}
+
+        {% block other_pages %}
+        <style>
+        .footer {
+            position: fixed;
+            width: 60em;
+            bottom: 5em;
+            left: calc( 50% - ( 60em / 2) );
+        }
+
+        .footer .col-6 {
+            text-align: center;
+        }
+        </style>
+        <div class="footer row">
+            <div class="col-6">
+                <a href="{{ path('user_index') }}" class="btn btn-dark">Go to Users</a>
+            </div>
+            <div class="col-6">
+                <a href="{{ path('work_index') }}" class="btn btn-dark">Go to Work Entry</a>
+            </div>
+        </div>
+        {% endblock %}
 
         <div id="loading-modal" style="display:none; position: absolute; top: 0; left: 0; z-index: 99; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5)">
             <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem; position: fixed; top: calc( 50% - ( 4rem / 2) ); left: calc( 50% - ( 4rem / 2) ); --bs-spinner-border-width: 0.5em;">

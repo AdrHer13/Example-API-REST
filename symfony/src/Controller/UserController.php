@@ -17,6 +17,12 @@ use Twig\Environment;
 
 class UserController extends AbstractController
 {
+    #[Route('/', name: 'user_landing')]
+    public function landing(Environment $environment): Response
+    {
+        return new Response($environment->render('base.html.twig', []));
+    }
+
     #[Route('/user', name: 'user_index')]
     public function index(EntityManagerInterface $em, Environment $environment): Response
     {
