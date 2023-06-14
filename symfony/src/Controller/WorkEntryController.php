@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\WorkEntry;
 use App\Form\WorkEntryFormType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -115,7 +116,8 @@ class WorkEntryController extends AbstractController
             throw new Exception('EndDate cannot be less than StartDate');
         }
 
-        $workEntry->setUserId($request->get('work_entry_form')['userId']);
+        $user = $em->getRepository(User::class)->find($request->get('work_entry_form')['userId']);
+        $workEntry->setUserId($user->getId());
         if ($request->get('work_entry_form')['endDate'])
             $workEntry->setEndDate($request->get('work_entry_form')['endDate']);
         $em->persist($workEntry);
