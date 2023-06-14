@@ -34,6 +34,11 @@ class WorkEntry
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $endDate = null;
 
+    public function __construct()
+    {
+        $this->startDate = new \DateTime("now", new \DateTimeZone('Europe/Madrid'));
+    }
+
     public function getId(): ?int
     {
         return $this->id;

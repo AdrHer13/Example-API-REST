@@ -22,7 +22,6 @@ class WorkEntryFormType extends AbstractType
                     'year' => 'Year', 'month' => 'Month', 'day' => 'Day',
                     'hour' => 'Hour', 'minute' => 'Minute', 'second' => 'Second',
                 ],
-                'data' => new \DateTime("now", new \DateTimeZone('Europe/Madrid')),
                 'required' => true,
             ])
             ->add('endDate', DateTimeType::class, [

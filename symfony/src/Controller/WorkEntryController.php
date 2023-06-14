@@ -109,17 +109,21 @@ class WorkEntryController extends AbstractController
         $startDateRaw = $request->get('work_entry_form')['startDate'];
         $startDate = date_create_from_format('d-m-Y h:i', str_pad($startDateRaw['date']['day'], 2, "0", STR_PAD_LEFT) . '-' . str_pad($startDateRaw['date']['month'], 2, "0", STR_PAD_LEFT) . '-' . $startDateRaw['date']['year'] . ' ' . str_pad($startDateRaw['time']['hour'], 2, "0", STR_PAD_LEFT) . ':' . str_pad($startDateRaw['time']['minute'], 2, "0", STR_PAD_LEFT));
 
-        $endDateRaw = $request->get('work_entry_form')['endDate'];
-        $endDate = date_create_from_format('d-m-Y h:i', str_pad($endDateRaw['date']['day'], 2, "0", STR_PAD_LEFT) . '-' . str_pad($endDateRaw['date']['month'], 2, "0", STR_PAD_LEFT) . '-' . $endDateRaw['date']['year'] . ' ' . str_pad($endDateRaw['time']['hour'], 2, "0", STR_PAD_LEFT) . ':' . str_pad($endDateRaw['time']['minute'], 2, "0", STR_PAD_LEFT), new \DateTimeZone('Europe/Madrid'));
+        if ($request->get('work_entry_form')['endDate']){
+            $endDateRaw = $request->get('work_entry_form')['endDate'];
+            $endDate = date_create_from_format('d-m-Y h:i', str_pad($endDateRaw['date']['day'], 2, "0", STR_PAD_LEFT) . '-' . str_pad($endDateRaw['date']['month'], 2, "0", STR_PAD_LEFT) . '-' . $endDateRaw['date']['year'] . ' ' . str_pad($endDateRaw['time']['hour'], 2, "0", STR_PAD_LEFT) . ':' . str_pad($endDateRaw['time']['minute'], 2, "0", STR_PAD_LEFT), new \DateTimeZone('Europe/Madrid'));
+    
+            if ($endDate < $startDate and !is_null($endDate)) {
+                throw new Exception('EndDate cannot be less than StartDate');
+            }
 
-        if ($endDate < $startDate and !is_null($endDate)) {
-            throw new Exception('EndDate cannot be less than StartDate');
+            $workEntry->setEndDate($endDate);
         }
 
         $user = $em->getRepository(User::class)->find($request->get('work_entry_form')['userId']);
         $workEntry->setUserId($user);
-        if ($request->get('work_entry_form')['endDate'])
-            $workEntry->setEndDate($request->get('work_entry_form')['endDate']);
+        $workEntry->setStartDate($startDate);
+        
         $em->persist($workEntry);
         $em->flush();
 
