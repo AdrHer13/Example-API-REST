@@ -117,7 +117,7 @@ class WorkEntryController extends AbstractController
         }
 
         $user = $em->getRepository(User::class)->find($request->get('work_entry_form')['userId']);
-        $workEntry->setUserId($user->getId());
+        $workEntry->setUserId($user);
         if ($request->get('work_entry_form')['endDate'])
             $workEntry->setEndDate($request->get('work_entry_form')['endDate']);
         $em->persist($workEntry);
